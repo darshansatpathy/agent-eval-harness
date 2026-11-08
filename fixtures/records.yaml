@@ -1,0 +1,8 @@
+# Records the reference agent's tools read: invoices by id and accounts by email.
+invoices:
+  INV-204118: {status: paid, amount: "$96.00", plan: Plus (annual), date: "2026-03-02"}
+  INV-204377: {status: failed, amount: "$14.00", plan: Business (monthly add-on), date: "2026-09-14"}
+  INV-205002: {status: refunded, amount: "$168.00", plan: Business (annual), date: "2026-10-01"}
+accounts:
+  maria@example.com: {plan: Plus, billing: monthly, devices: 4, storage_used_gb: 12.4}
+  dev@example.org: {plan: Free, billing: none, devices: 2, storage_used_gb: 0.8}
