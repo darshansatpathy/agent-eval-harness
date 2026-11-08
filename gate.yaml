@@ -1,0 +1,11 @@
+# What a candidate agent must not do relative to the baseline. See src/evalgate/gate.py.
+alpha: 0.05
+min_judge_kappa: 0.6
+tolerances:
+  pass_rate: 0.03
+  faithfulness: 0.02
+  citation_recall: 0.05
+  abstention_accuracy: 0.0
+  refusal_accuracy: 0.0
+  tool_accuracy: 0.0
+max_latency_p95_increase: 0.5
