@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JUDGE: cross-encoder/nli-deberta-v3-xsmall
+
+jobs:
+  test:
+    name: Lint, types, tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: mypy
+      - name: Fast tests (a word-overlap stand-in for the judge)
+        run: pytest -m "not judge" --cov --cov-report=term-missing --cov-fail-under=85
+
+  eval-gate:
+    name: Agent on this branch against the baseline
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - run: pip install -e ".[judge,dev]"
+      - uses: actions/cache@v5
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ env.JUDGE }}
+      - name: Judge tests
+        run: pytest -m judge -q
+      - name: Run the golden set with the judge
+        run: evg run --agent configs/agent.yaml --out runs/candidate.json
+      - name: Gate against baselines/main.json (fails the build if blocked)
+        run: evg gate --baseline baselines/main.json --candidate runs/candidate.json --summary "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: candidate-run
+          path: runs/candidate.json
+
+  package:
+    name: Wheel builds and installs
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install build && python -m build
+      - run: |
+          python -m venv /tmp/venv
+          /tmp/venv/bin/pip install dist/*.whl
+          cd /tmp && /tmp/venv/bin/evg --version
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install -e . pip-audit
+      - run: pip-audit --skip-editable
