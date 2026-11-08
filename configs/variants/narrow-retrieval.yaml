@@ -1,0 +1,4 @@
+# A "speed-up": retrieve one passage instead of three and answer in one sentence.
+name: narrow-retrieval
+top_k: 1
+sentences: 1

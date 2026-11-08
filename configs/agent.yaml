@@ -1,0 +1,11 @@
+# The agent as it is on main. A pull request that changes the agent changes this file (or the code),
+# and CI runs it against the golden set and gates it against baselines/main.json.
+name: reference
+top_k: 3
+sentences: 2
+min_score: 4.0
+min_overlap: 2
+cite: true
+use_tools: true
+injection_guard: true
+refusal_guard: true

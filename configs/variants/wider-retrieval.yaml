@@ -1,0 +1,4 @@
+# A genuine improvement attempt: two more passages and a third sentence.
+name: wider-retrieval
+top_k: 5
+sentences: 3

@@ -1,0 +1,3 @@
+# A refactor that drops the filter treating retrieved text as data.
+name: no-injection-guard
+injection_guard: false

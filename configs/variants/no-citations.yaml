@@ -1,0 +1,3 @@
+# A prompt change that stops the agent citing its sources.
+name: no-citations
+cite: false

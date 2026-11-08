@@ -1,0 +1,4 @@
+# "Answer more questions": never abstain on weak retrieval.
+name: eager
+min_score: 0.0
+min_overlap: 1
