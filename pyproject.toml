@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-eval-harness"
+version = "0.1.0"
+description = "Evaluation harness for LLM agents: golden sets, deterministic graders, a separate calibrated judge model, and a CI gate that blocks regressions."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [{ name = "Darshan Kumar Satpathy" }]
+dependencies = [
+  "httpx>=0.28",
+  "numpy>=2.0",
+  "pydantic>=2.9",
+  "pyyaml>=6.0",
+  "rank-bm25>=0.2.2",
+]
+
+[project.optional-dependencies]
+judge = ["torch>=2.4", "transformers>=4.45"]
+dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.8", "mypy>=1.13", "types-PyYAML"]
+
+[project.scripts]
+evg = "evalgate.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 140
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 180
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src"]
+
+[[tool.mypy.overrides]]
+module = ["rank_bm25.*", "transformers.*", "torch.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["judge: needs the NLI judge model (downloads about 280 MB once)"]
+
+[tool.coverage.run]
+source = ["evalgate"]
