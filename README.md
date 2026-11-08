@@ -76,7 +76,8 @@ The reference agent (BM25 retrieval, extractive answers, two tools, injection an
 ```python
 class MyAgent:
     name = "my-agent"
-    def respond(self, question: str) -> Response:   # evalgate.types.Response
+
+    def respond(self, question: str) -> Response:  # evalgate.types.Response
         ...  # answer, citations, contexts used, tool calls, tokens, cost
 ```
 
